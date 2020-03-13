@@ -512,11 +512,15 @@ class VerilogCommonVisitor(object):
         name = node.name
         return vast.Identifier(name)
 
+    def visit_DpiImportFunction(self, node):
+        name = node.name
+        return vast.Identifier(name)
+
     def visit_FunctionCall(self, node):
         func = self.visit(node.func)
         args = tuple([self.visit(a) for a in node.args])
         return vast.FunctionCall(func, args)
-
+ 
     #-------------------------------------------------------------------------
     def visit_Task(self, node):
         name = node.name
@@ -752,6 +756,16 @@ class VerilogModuleVisitor(VerilogCommonVisitor):
         statement.append(self._optimize_block(
             vast.Block(tuple([self.blocking_visitor.visit(s) for s in node.statement]))))
         return vast.Function(name, retwidth, statement)
+
+    def visit_DpiImportFunction(self, node):
+        name = node.name
+        retwidth = self.make_width(node)
+
+        ports = [self.visit(v) for v in node.io_variable.values()]
+        ports = [i for i in ports if i is not None]
+        portlist = vast.Portlist(tuple(ports))
+
+        return vast.DpiImportFunction(name, portlist)
 
     #-------------------------------------------------------------------------
     def visit_Task(self, node):

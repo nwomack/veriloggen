@@ -111,7 +111,7 @@ class Module(vtypes.VeriloggenNode):
         self.variable[name] = t
         self.items.append(t)
         return t
-
+            
     def TmpReg(self, width=None, dims=None, signed=False, value=None,
                initval=None, prefix=None):
 
@@ -475,6 +475,13 @@ class Module(vtypes.VeriloggenNode):
 
         t = vtypes.Initial(*statement)
         self.initial.append(t)
+        self.items.append(t)
+        return t
+
+    def DpiImportFunction(self, name, width=1):
+        t = function.DpiImportFunction(name, width)
+        self.check_existing_identifier(name)
+        self.function[name] = t
         self.items.append(t)
         return t
 
@@ -937,7 +944,8 @@ class Module(vtypes.VeriloggenNode):
         return ret
 
     def connect_ports(self, targ, prefix=None, postfix=None,
-                      include=None, exclude=None, strict=False):
+                      include=None, exclude=None, strict=False,
+                      use_fullmatch=False):
         if prefix is None:
             prefix = ''
         if postfix is None:
@@ -1249,6 +1257,9 @@ class Module(vtypes.VeriloggenNode):
         for sub in self.submodule.values():
             modules.update(sub.get_modules())
         return modules
+
+    def get_instances(self):
+            return copy.deepcopy(self.instance)
 
     def check_existing_identifier(self, name, *types):
         s = self.find_identifier(name)

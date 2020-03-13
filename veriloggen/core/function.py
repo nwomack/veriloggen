@@ -7,6 +7,30 @@ import collections
 import veriloggen.core.vtypes as vtypes
 
 
+class DpiImportFunction(vtypes.VeriloggenNode):
+
+    def __init__(self, name, width=1, raw_width=None):
+        vtypes.VeriloggenNode.__init__(self)
+        self.name = name
+        self.width = width
+        self.raw_width = raw_width
+        self.io_variable = collections.OrderedDict()
+
+    def Input(self, name, width=None, dims=None, signed=False, value=None):
+        t = vtypes.Input(width, dims, signed, value, name=name, module=self)
+        self.io_variable[name] = t
+        return t
+
+    def Output(self, name, width=None, dims=None, signed=False, value=None):
+        t = vtypes.Output(width, dims, signed, value, name=name, module=self)
+        self.io_variable[name] = t
+        return t
+
+    # function call
+    def call(self, *args):
+        return FunctionCall(self, *args)
+
+
 class Function(vtypes.VeriloggenNode):
 
     def __init__(self, name, width=1, raw_width=None):
