@@ -425,6 +425,10 @@ class VerilogCommonVisitor(object):
         statement = self.visit(node.statement)
         return vast.WhileStatement(cond, statement)
 
+    def visit_Forever(self, node):
+        statement = self.visit(node.statement)
+        return vast.ForeverStatement(statement)
+
     #-------------------------------------------------------------------------
     def visit_Case(self, node):
         comp = self.visit(node.comp)
